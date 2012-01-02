@@ -3,7 +3,7 @@
 
   <groupId>edu.tamu.mock</groupId>
   <artifactId>mock-swordserver</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>DSpace Mock Sword Server</name>
@@ -21,6 +21,19 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
+  <distributionManagement>
+    <repository>
+      <id>tamu-releases</id>
+      <name>TAMU Maven Repository - RELEASES</name>
+      <url>https://maven.library.tamu.edu/content/repositories/releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>tamu-snapshots</id>
+      <name>TAMU Maven Repository - SNAPSHOTS </name>
+      <url>https://maven.library.tamu.edu/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <build>
 	  <plugins>
