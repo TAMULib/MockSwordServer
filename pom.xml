@@ -1,18 +1,22 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>edu.tamu</groupId>
-  <artifactId>dspace-mock-sword-server</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <groupId>edu.tamu.mock</groupId>
+  <artifactId>mock-swordserver</artifactId>
+  <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Mock Sword Server</name>
+  <name>DSpace Mock Sword Server</name>
 
-   <organization>
+  <organization>
       <name>Texas A&amp;M University Libraries</name>
       <url>http://www.library.tamu.edu</url>
    </organization>
+
+  <scm>
+  	<url>https://svn.library.tamu.edu/svn/applications/development/MockSwordServer/tags/mock-swordserver-1.0</url>
+  	<connection>scm:svn:https://svn.library.tamu.edu/svn/applications/development/MockSwordServer/tags/mock-swordserver-1.0</connection>
+  </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
