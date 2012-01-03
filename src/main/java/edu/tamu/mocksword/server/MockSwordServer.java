@@ -1,7 +1,12 @@
 package edu.tamu.mocksword.server;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +24,10 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.xpath.XPath;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.security.Constraint;
+import org.mortbay.jetty.security.ConstraintMapping;
+import org.mortbay.jetty.security.HashUserRealm;
+import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.purl.sword.atom.Author;
@@ -81,17 +90,6 @@ public class MockSwordServer implements SWORDServer {
 	public ServiceDocument doServiceDocument(ServiceDocumentRequest sdr)
 			throws SWORDAuthenticationException, SWORDErrorException,
 			SWORDException {
-		// Authenticate the user
-		String username = sdr.getUsername();
-		String password = sdr.getPassword();
-		if ((username != null)
-				&& (password != null)
-				&& (((username.equals("")) && (password.equals(""))) || (!username
-						.equalsIgnoreCase(password)))) {
-			// User not authenticated
-			log.info("User failed credentials check with username='"+username+"', password='"+password+"'");
-			throw new SWORDAuthenticationException("Bad credentials");
-		}
 
 		// Allow users to force the throwing of a SWORD error exception by
 		// setting the OBO user to 'error'
@@ -173,18 +171,6 @@ public class MockSwordServer implements SWORDServer {
 	public DepositResponse doDeposit(Deposit deposit)
 			throws SWORDAuthenticationException, SWORDErrorException,
 			SWORDException {
-
-		// Authenticate the user
-		String username = deposit.getUsername();
-		String password = deposit.getPassword();
-		if ((username != null)
-				&& (password != null)
-				&& (((username.equals("")) && (password.equals(""))) || (!username
-						.equalsIgnoreCase(password)))) {
-			// User not authenticated
-			log.info("User failed credentials check with username='"+username+"', password='"+password+"'");
-			throw new SWORDAuthenticationException("Bad credentials");
-		}
 
 		// Check this is a collection that takes obo deposits, else thrown an
 		// error
@@ -298,6 +284,7 @@ public class MockSwordServer implements SWORDServer {
 		s.setContent(filenames.toString());
 		se.setSummary(s);
 		Author a = new Author();
+		String username = deposit.getUsername();
 		if (username != null) {
 			a.setName(username);
 		} else {
@@ -405,17 +392,6 @@ public class MockSwordServer implements SWORDServer {
 	public AtomDocumentResponse doAtomDocument(AtomDocumentRequest adr)
 			throws SWORDAuthenticationException, SWORDErrorException,
 			SWORDException {
-		// Authenticate the user
-		String username = adr.getUsername();
-		String password = adr.getPassword();
-		if ((username != null)
-				&& (password != null)
-				&& (((username.equals("")) && (password.equals(""))) || (!username
-						.equalsIgnoreCase(password)))) {
-			// User not authenticated
-			throw new SWORDAuthenticationException("Bad credentials");
-		}
-
 		return new AtomDocumentResponse(HttpServletResponse.SC_OK);
 	}
 
@@ -436,10 +412,29 @@ public class MockSwordServer implements SWORDServer {
 		String swordServer = new MockSwordServer().getClass().getCanonicalName();
 		initParams.put("sword-server-class", swordServer);
 		root.setInitParams(initParams);
+		
+		// Add basic authentication
+		Constraint constraint = new Constraint();
+		constraint.setName(Constraint.__BASIC_AUTH);
+		constraint.setRoles(new String[]{"user"});
+		constraint.setAuthenticate(true);
+		
+		ConstraintMapping cm = new ConstraintMapping();
+		cm.setConstraint(constraint);
+		cm.setPathSpec("/*");
+		
+		File file = File.createTempFile("jetty-users", ".properties");
+		setContents(file,"testUser = testPassword,user");
+		
+		
+		SecurityHandler sh = new SecurityHandler();
+		sh.setUserRealm(new HashUserRealm("MyRealm",file.getAbsolutePath()));
+		sh.setConstraintMappings(new ConstraintMapping[]{cm});
 
 		// Install the two SWORD Servlets
 		root.addServlet(new ServletHolder(new MockSwordDepositServlet()),"/deposit/*");
 		root.addServlet(new ServletHolder(new MockSwordServiceDocumentServlet()),"/servicedocument/*");
+		root.addHandler(sh);
 
 		// Start the server
 		server.start();
@@ -454,6 +449,44 @@ public class MockSwordServer implements SWORDServer {
 			server = null;
 		}
 	}
-	//	
+	
+	
+	
+	/**
+	  * Change the contents of text file in its entirety, overwriting any
+	  * existing text.
+	  *
+	  * This style of implementation throws all exceptions to the caller.
+	  *
+	  * @param aFile is an existing file which can be written to.
+	  * @throws IllegalArgumentException if param does not comply.
+	  * @throws FileNotFoundException if the file does not exist.
+	  * @throws IOException if problem encountered during write.
+	  */
+	  static private void setContents(File aFile, String aContents)
+	                                throws FileNotFoundException, IOException {
+	    if (aFile == null) {
+	      throw new IllegalArgumentException("File should not be null.");
+	    }
+	    if (!aFile.exists()) {
+	      throw new FileNotFoundException ("File does not exist: " + aFile);
+	    }
+	    if (!aFile.isFile()) {
+	      throw new IllegalArgumentException("Should not be a directory: " + aFile);
+	    }
+	    if (!aFile.canWrite()) {
+	      throw new IllegalArgumentException("File cannot be written: " + aFile);
+	    }
+
+	    //use buffering
+	    Writer output = new BufferedWriter(new FileWriter(aFile));
+	    try {
+	      //FileWriter always assumes default encoding is OK!
+	      output.write( aContents );
+	    }
+	    finally {
+	      output.close();
+	    }
+	  }
 
 }

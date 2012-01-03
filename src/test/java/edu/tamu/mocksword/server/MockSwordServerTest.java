@@ -41,7 +41,7 @@ public class MockSwordServerTest
         
         Client client = new Client();
         client.setServer("localhost", 8082);
-        client.setCredentials("test", "test");
+        client.setCredentials("testUser", "testPassword");
         
         // Get the service document 
         ServiceDocument serviceDocument = client.getServiceDocument("http://localhost:8082/servicedocument");
@@ -76,13 +76,35 @@ public class MockSwordServerTest
     }
 	
 	
+	@Test(expected=SWORDClientException.class)
+	public void testServiceDocumentWithBadAuth() throws SWORDClientException {
+		
+		Client client = new Client();
+        client.setServer("localhost", 8082);
+        client.setCredentials("invalidUser", "invalidPassword");
+        
+        // Get the service document 
+        ServiceDocument serviceDocument = client.getServiceDocument("http://localhost:8082/servicedocument");
+	}
+	
+	@Test(expected=SWORDClientException.class)
+	public void testServiceDocumentWithOnBehalfOfError() throws SWORDClientException {
+		
+		Client client = new Client();
+        client.setServer("localhost", 8082);
+        client.setCredentials("testUser", "testPassword");
+        
+        // Get the service document 
+        ServiceDocument serviceDocument = client.getServiceDocument("http://localhost:8082/servicedocument","error");
+	}
+	
 	@Test
 	public void testValidDeposit() throws Exception 
 	{
 		
         Client client = new Client();
         client.setServer("localhost", 8082);
-        client.setCredentials("test", "test");
+        client.setCredentials("testUser", "testPassword");
         
         File depositPackage = new File("src/main/resources/validDeposit.zip");
         assertTrue(depositPackage.exists());
@@ -110,7 +132,7 @@ public class MockSwordServerTest
 		
         Client client = new Client();
         client.setServer("localhost", 8082);
-        client.setCredentials("test", "test");
+        client.setCredentials("testUser", "testPassword");
         
         File depositPackage = new File("src/main/resources/invalidDeposit.zip");
         assertTrue(depositPackage.exists());
@@ -129,4 +151,5 @@ public class MockSwordServerTest
         
         client.postFile(message);
 	}
+	
 }
