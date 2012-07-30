@@ -14,8 +14,8 @@
    </organization>
 
   <scm>
-  	<url>https://svn.library.tamu.edu/svn/applications/development/MockSwordServer/tags/mock-swordserver-1.0</url>
-  	<connection>scm:svn:https://svn.library.tamu.edu/svn/applications/development/MockSwordServer/tags/mock-swordserver-1.0</connection>
+  	<url>https://github.com/TAMULib/MockSwordServer</url>
+  	<connection>scm:git:https://github.com/TAMULib/MockSwordServer.git</connection>
   </scm>
 
   <properties>
