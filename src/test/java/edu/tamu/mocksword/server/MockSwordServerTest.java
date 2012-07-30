@@ -123,7 +123,7 @@ public class MockSwordServerTest
         
         DepositResponse response = client.postFile(message);
         assertEquals(201,response.getHttpResponse());
-        assertEquals("ID: 1",response.getEntry().getId());
+        assertEquals("http://localhost/sword/deposit/1",response.getEntry().getId());
 	}
 	
 	@Test(expected=SWORDClientException.class)
