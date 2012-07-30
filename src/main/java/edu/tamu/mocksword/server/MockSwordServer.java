@@ -271,7 +271,7 @@ public class MockSwordServer implements SWORDServer {
 		if (deposit.getSlug() != null) {
 			se.setId(deposit.getSlug() + " - ID: " + counter);
 		} else {
-			se.setId("ID: " + counter);
+			se.setId("http://localhost/sword/deposit/" + counter);
 		}
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
